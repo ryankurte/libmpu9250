@@ -31,8 +31,8 @@ int8_t mpu9250_transfer_data_adaptor(void* context, uint8_t *data_in, uint8_t* d
 // Note that this can be static as driver context is passed separately to the driver
 class SpiDriverWrapper {
 public:
-    static struct mpu9250_driver_s GetWrapper() {
-        return driver;
+    static struct mpu9250_driver_s * GetWrapper() {
+        return &driver;
     }
 
 private:

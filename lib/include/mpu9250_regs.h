@@ -1,6 +1,15 @@
+/*
+ * mpu9250 registers for internal library use
+ *
+ * Copyright 2016 Ryan Kurte
+ */
 
-#ifndef REGISTERS_H
-#define REGISTERS_H
+#ifndef MPU9250_REGS_H
+#define MPU9250_REGS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // MPU9250 Register Enumeration
 enum mpu9250_reg_e {
@@ -142,6 +151,11 @@ enum mpu9250_reg_e {
     REG_ZA_OFFSET_L = 0x7E
 
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

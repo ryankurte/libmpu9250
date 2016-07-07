@@ -54,7 +54,7 @@ include_directories(${CMAKE_BINARY_DIR})
 # Generate executable and link
 add_executable(${TARGET} ${TEST_SOURCES})
 target_link_libraries(${TARGET} ${OPTIONAL_LIBS} pthread gmock)
-add_dependencies(${TARGET} googletest version)
+add_dependencies(${TARGET} version)
 
 ##### Testing #####
 add_custom_target(tests COMMAND ${TARGET})

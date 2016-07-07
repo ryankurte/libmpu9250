@@ -1,10 +1,15 @@
 /*
  * mpu9250 related definitions for internal library use
  *
+ * Copyright 2016 Ryan Kurte
  */
 
 #ifndef MPU9250_DEFS_H
 #define MPU9250_DEFS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Gyro configuration definitions
 #define MPU9250_GYRO_CONFIG_X_SELF_TEST_EN     (1 << 7)
@@ -45,5 +50,10 @@ struct mpu9250_s {
     struct mpu9250_driver_s* driver;    //!< Driver function object
     void* driver_ctx;                   //!< Driver context
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -6,6 +6,11 @@
 
 #include "mpu9250_defs.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // SPI interaction function for dependency injection
 typedef int8_t (*spi_transfer_f)(void* context, uint8_t *data_in, uint8_t* data_out, uint8_t len);
 
@@ -27,5 +32,10 @@ int mpu9250_read_temp(struct mpu9250_s *device, uint16_t *temp);
 
 // Close an mpu9250 device
 int8_t mpu9250_close(struct mpu9250_s *device);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
