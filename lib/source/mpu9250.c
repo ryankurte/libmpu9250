@@ -14,7 +14,8 @@
 
 /***        Internal Functions          ***/
 
-static int mpu9250_reg_read(struct mpu9250_s *device, uint8_t reg, uint8_t* val) {
+static int mpu9250_reg_read(struct mpu9250_s *device, uint8_t reg, uint8_t* val)
+{
     uint8_t data_out[2];
     uint8_t data_in[2];
     int res;
@@ -24,14 +25,15 @@ static int mpu9250_reg_read(struct mpu9250_s *device, uint8_t reg, uint8_t* val)
 
     res = device->driver->spi_transfer(device->driver_ctx, data_out, data_in, 2);
 
-    if(res >= 0) {
+    if (res >= 0) {
         *val = data_in[1];
     }
 
     return res;
 }
 
-static int mpu9250_reg_write(struct mpu9250_s *device, uint8_t reg, uint8_t val) {
+static int mpu9250_reg_write(struct mpu9250_s *device, uint8_t reg, uint8_t val)
+{
     uint8_t data_out[2];
     int res;
 
@@ -43,70 +45,67 @@ static int mpu9250_reg_write(struct mpu9250_s *device, uint8_t reg, uint8_t val)
     return res;
 }
 
+int mpu9250_reg_update(struct mpu9250_s *device, uint8_t reg, uint8_t val, uint8_t mask)
+{
+    uint8_t data = 0;
+    int res;
+
+    // Read existing config
+    res = mpu9250_reg_read(device, reg, &data);
+    if (res < 0) {
+        return res;
+    }
+
+    // Update
+    data &= ~mask;
+    data |=  mask & val;
+
+    // Write back
+    return mpu9250_reg_write(device, reg, data);
+}
+
 /***        External Functions          ***/
 
 int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, void* driver_ctx)
 {
     // Check driver functions exist
-    if(driver->spi_transfer == NULL) {
+    if (driver->spi_transfer == NULL) {
         return -1;
     }
-    
+
     // Save driver pointers
     device->driver = driver;
     device->driver_ctx = driver_ctx;
-    
+
     // TODO: init
-    
+
     return 0;
 }
 
 int8_t mpu9250_close(struct mpu9250_s *device)
 {
     // TODO: shutdown
-    
+
     // Clear driver pointer
     device->driver = NULL;
-    
+
     return 0;
 }
 
 int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
 {
-    uint8_t gyro_cfg = 0;
-    int res;
-
-    // Read existing config
-    res = mpu9250_reg_read(device, REG_GYRO_CONFIG, &gyro_cfg);
-    if(res < 0) {
-        return res;
-    }
-
-    // Update
-    gyro_cfg &= ~MPU9250_GYRO_CONFIG_SCALE_MASK;
-    gyro_cfg |=  MPU9250_GYRO_CONFIG_SCALE_MASK & (scale << MPU9250_GYRO_CONFIG_SCALE_SHIFT);
-    
-    // Write back
-    return mpu9250_reg_write(device, REG_GYRO_CONFIG, gyro_cfg);
+    return mpu9250_reg_update(device,
+                              REG_GYRO_CONFIG,
+                              scale << MPU9250_GYRO_CONFIG_SCALE_SHIFT,
+                              MPU9250_GYRO_CONFIG_SCALE_MASK);
 }
 
 int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scale)
 {
-    uint8_t accel_cfg = 0;
-    int res;
-
-    // Read existing config
-    res = mpu9250_reg_read(device, REG_ACCEL_CONFIG_1, &accel_cfg);
-    if(res < 0) {
-        return res;
-    }
-
-    // Update
-    accel_cfg &= ~MPU9250_ACCEL_CONFIG_1_SCALE_MASK;
-    accel_cfg |=  MPU9250_ACCEL_CONFIG_1_SCALE_MASK & (scale << MPU9250_ACCEL_CONFIG_1_SCALE_SHIFT);
-    
-    // Write back
-    return mpu9250_reg_write(device, REG_ACCEL_CONFIG_1, accel_cfg);
+    return mpu9250_reg_update(device,
+                              REG_ACCEL_CONFIG_1,
+                              scale << MPU9250_ACCEL_CONFIG_1_SCALE_SHIFT,
+                              MPU9250_ACCEL_CONFIG_1_SCALE_MASK);
 }
 
 
