@@ -40,6 +40,7 @@ enum mpu9250_accel_scale_e {
 struct mpu9250_s {
     int open;                           //!< Indicates whether the device is open
     struct mpu9250_driver_s* driver;    //!< Driver function object
+    void* driver_ctx;                   //!< Driver context
 };
 
 #endif

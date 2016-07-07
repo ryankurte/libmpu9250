@@ -1,6 +1,7 @@
 /*
  * mpu9250 registers for internal library use
  *
+ * Copyright 2016 Ryan Kurte
  */
 
 #ifndef REGISTERS_H
