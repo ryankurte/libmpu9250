@@ -18,17 +18,6 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11 -g")
 # Set build type
 set(CMAKE_BUILD_TYPE DEBUG)
 
-# Fetch and build google test
-ExternalProject_Add(googletest
-    GIT_REPOSITORY git@github.com:google/googletest.git
-    INSTALL_COMMAND echo "Skipping install"
-    )
-
-ExternalProject_Get_Property(googletest BINARY_DIR)
-link_directories(${BINARY_DIR}/googlemock)
-ExternalProject_Get_Property(googletest SOURCE_DIR)
-include_directories(${SOURCE_DIR}/googlemock/include)
-
 ##### Modules #####
 
 include(${PROJECT_SOURCE_DIR}/lib/mpu9250.cmake)
