@@ -26,6 +26,8 @@ ExternalProject_Add(googletest
 
 ExternalProject_Get_Property(googletest BINARY_DIR)
 link_directories(${BINARY_DIR}/googlemock)
+ExternalProject_Get_Property(googletest SOURCE_DIR)
+include_directories(${SOURCE_DIR}/googlemock/include)
 
 ##### Modules #####
 

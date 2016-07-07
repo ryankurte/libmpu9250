@@ -2,7 +2,8 @@
 
 #include "gtest/gtest.h"
 
-#include "dynamixel.hpp"
+#include "mpu9250.hpp"
+#include "mock_spi.hpp"
 
 // The fixture for testing class Foo.
 class Mpu9250Test : public ::testing::Test {
