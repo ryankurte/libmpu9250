@@ -24,6 +24,9 @@ ExternalProject_Add(googletest
     INSTALL_COMMAND echo "Skipping install"
     )
 
+ExternalProject_Get_Property(googletest BINARY_DIR)
+link_directories(${BINARY_DIR}/googlemock)
+
 ##### Modules #####
 
 include(${PROJECT_SOURCE_DIR}/lib/mpu9250.cmake)
@@ -47,7 +50,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 # Generate executable and link
 add_executable(${TARGET} ${TEST_SOURCES})
-target_link_libraries(${TARGET} ${OPTIONAL_LIBS} pthread gtest gmock)
+target_link_libraries(${TARGET} ${OPTIONAL_LIBS} pthread gmock)
 add_dependencies(${TARGET} googletest version)
 
 ##### Testing #####
