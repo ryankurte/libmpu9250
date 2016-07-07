@@ -5,13 +5,13 @@ cmake_minimum_required(VERSION 2.8.4)
 ##### Project Setup #####
 
 # Set our output target
-set(TARGET mpu9250)
+set(TARGET mpu9250test)
 
 # Configure project and languages
 project(${TARGET} C CXX ASM)
 
-set(CMAKE_C_FLAGS "-std=gnu14 -g")
-set(CMAKE_CXX_FLAGS "-std=gnu++14 -g")
+set(CMAKE_C_FLAGS "-std=gnu11 -g")
+set(CMAKE_CXX_FLAGS "-std=gnu++11 -g")
 
 # Set build
 set(CMAKE_BUILD_TYPE DEBUG)

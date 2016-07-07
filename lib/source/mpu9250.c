@@ -2,6 +2,7 @@
 
 #include "mpu9250.h"
 
+#include <stdlib.h>
 #include <stdint.h>
 
 int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, void* driver_ctx)
