@@ -19,18 +19,18 @@ class Mpu9250
 public:
 
     // Init using C style driver interface
-    int Init(struct mpu9250_driver_s *driver, void *driver_ctx) {
+    int init(struct mpu9250_driver_s *driver, void *driver_ctx) {
         return mpu9250_init(&(this->device), driver, driver_ctx);
     }
 
     // Init using C++ style driver interface
-    int Init(SpiDriverInterface* driver_ctx) {
+    int init(SpiDriverInterface* driver_ctx) {
         struct mpu9250_driver_s *driver = SpiDriverWrapper::GetWrapper();
         return mpu9250_init(&(this->device), driver, (void*)driver_ctx);
     }
 
     // Close device
-    int Close() {
+    int close() {
         return mpu9250_close(&(this->device));
     }
 
@@ -41,14 +41,14 @@ public:
         return mpu9250_set_accel_scale(&(this->device), scale);
     }
 
-    int read_gyro(uint16_t *x, uint16_t *y, uint16_t *z) {
-        return mpu9250_read_gyro(&(this->device), x, y, z);
+    int read_gyro_raw(uint16_t *x, uint16_t *y, uint16_t *z) {
+        return mpu9250_read_gyro_raw(&(this->device), x, y, z);
     }
-    int read_accel(uint16_t *x, uint16_t *y, uint16_t *z) {
-        return mpu9250_read_accel(&(this->device), x, y, z);
+    int read_accel_raw(uint16_t *x, uint16_t *y, uint16_t *z) {
+        return mpu9250_read_accel_raw(&(this->device), x, y, z);
     }
-    int read_temp(uint16_t *temp) {
-        return mpu9250_read_temp(&(this->device), temp);
+    int read_temp_raw(uint16_t *temp) {
+        return mpu9250_read_temp_raw(&(this->device), temp);
     }
 
 private:

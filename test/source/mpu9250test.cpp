@@ -26,14 +26,14 @@ protected:
   {
     mpu = Mpu9250();
 
-    int res = mpu.Init(&mockSpi);
+    int res = mpu.init(&mockSpi);
 
     EXPECT_EQ(0, res);
   }
 
   void TearDown()
   {
-    mpu.Close();
+    mpu.close();
   }
 
   MockSpi mockSpi;

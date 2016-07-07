@@ -26,9 +26,9 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
 int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale);
 int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scale);
 
-int mpu9250_read_gyro(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
-int mpu9250_read_accel(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
-int mpu9250_read_temp(struct mpu9250_s *device, uint16_t *temp);
+int mpu9250_read_gyro_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
+int mpu9250_read_accel_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
+int mpu9250_read_temp_raw(struct mpu9250_s *device, uint16_t *temp);
 
 // Close an mpu9250 device
 int8_t mpu9250_close(struct mpu9250_s *device);
