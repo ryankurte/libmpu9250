@@ -26,7 +26,7 @@ enum mpu9250_reg_e {
     REG_ZG_OFFSET_L = 0x18,
 
     // Configuration Registers
-    REG_SMPLRT_DIV = 0x19,      //!< Sample rate divisor
+    REG_SMPLRT_DIV = 0x19,      //!< Sample rate divisor (Internal_Sample_Rate / (1 + SMPLRT_DIV))
     REG_CONFIG = 0x1A,          //!< General Configuration
     REG_GYRO_CONFIG = 0x1B,     //!< Gyro configuration
     REG_ACCEL_CONFIG_1 = 0x1C,  //!< Accel configuration 1
