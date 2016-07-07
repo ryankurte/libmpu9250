@@ -36,6 +36,9 @@ typedef enum {
     MPU9250_GYRO_SCALE_16G = 0x03
 } mpu9250_accel_scale_e;
 
+#define MPU9250_REG_READ_FLAG       0x80
+#define MPU9250_REG_WRITE_FLAG      0x80
+
 // MPU9250 object for internal use
 struct mpu9250_s {
     int open;                           //!< Indicates whether the device is open
