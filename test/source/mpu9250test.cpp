@@ -40,13 +40,15 @@ protected:
   Mpu9250 mpu;
 };
 
-MATCHER_P2(MaskedCompare, value, mask, "") { 
+MATCHER_P2(MaskedCompare, value, mask, "")
+{
   return (arg & mask) == value;
 }
 
-MATCHER_P2(ArrayCompare, data, len, "") { 
-  for(int i=0; i< len; i++) {
-    if(data[i] != arg[i]) {
+MATCHER_P2(ArrayCompare, data, len, "")
+{
+  for (int i = 0; i < len; i++) {
+    if (data[i] != arg[i]) {
       return false;
     }
   }
@@ -70,16 +72,18 @@ TEST_F(Mpu9250Test, SetGyroRate)
   uint8_t read_cmd[] = {read_addr, 0x00};
   uint8_t write_cmd[] = {write_addr, MPU9250_GYRO_SCALE_500DPS << MPU9250_GYRO_CONFIG_SCALE_SHIFT};
 
-  EXPECT_CALL(mockSpi, spi_transfer(ArrayCompare(read_cmd, 2), NotNull(), Eq(2)))
-  .Times(AtLeast(1))
-  .InSequence(s1)
-  .WillOnce(DoAll(SetArrayArgument<0>(mock_read, mock_read + 1), Return(0)));
-  
-  EXPECT_CALL(mockSpi, spi_transfer(Pointee(Eq(write_addr)), IsNull(), Eq(2)))
-  .Times(AtLeast(1))
-  .InSequence(s1)
-  .WillOnce(DoAll(SetArrayArgument<0>(mock_read, mock_read + 1), Return(0)));
-  
+  {
+    InSequence s1;
+    
+    EXPECT_CALL(mockSpi, spi_transfer(ArrayCompare(read_cmd, 2), NotNull(), Eq(2)))
+    .Times(AtLeast(1))
+    .WillOnce(DoAll(SetArrayArgument<0>(mock_read, mock_read + 1), Return(0)));
+
+    EXPECT_CALL(mockSpi, spi_transfer(Pointee(Eq(write_addr)), IsNull(), Eq(2)))
+    .Times(AtLeast(1))
+    .WillOnce(DoAll(SetArrayArgument<0>(mock_read, mock_read + 1), Return(0)));
+  }
+
   res = mpu.set_gyro_scale(MPU9250_GYRO_SCALE_500DPS);
 
   EXPECT_EQ(0, res);
