@@ -8,8 +8,15 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "mpu9250_regs.h"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#define G_TO_MS 9.80665
 
 
 /***        Internal Functions          ***/
@@ -90,9 +97,11 @@ int mpu9250_update_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val, uint8
 
 int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, void* driver_ctx)
 {
+    int res;
+
     // Check driver functions exist
     if (driver->spi_transfer == NULL) {
-        return -1;
+        return MPU9250_DRIVER_INVALID;
     }
 
     // Save driver pointers
@@ -101,13 +110,31 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
 
     // TODO: init
 
-    // Reboot
+    // Hard reset chip (nb. only works if SPI working)
+    res = mpu9250_write_reg(device, REG_PWR_MGMT_1, MPU9250_PWR_MGMT_1_HRESET);
+    if (res < 0) {
+        return MPU9250_DRIVER_ERROR;
+    }
+
+    //TODO: do we need a wait here? Probably.
+
+    // Check communication
+    uint8_t who;
+    res = mpu9250_read_reg(device, REG_WHO_AM_I, &who);
+    if (res < 0) {
+        return MPU9250_DRIVER_ERROR;
+    }
+    if (who != 0x71) {
+        return MPU9250_COMMS_ERROR;
+    }
 
     // Enable compass
 
+
     // Set default scales
 
-    // Set default sampling rate
+
+    // Set default sampling rate & filter
 
 
     return 0;
@@ -125,6 +152,19 @@ int8_t mpu9250_close(struct mpu9250_s *device)
 
 int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
 {
+    switch (scale) {
+    case MPU9250_GYRO_SCALE_250DPS:
+        device->gyro_scale = 250.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+    case MPU9250_GYRO_SCALE_500DPS:
+        device->gyro_scale = 500.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+    case MPU9250_GYRO_SCALE_1000DPS:
+        device->gyro_scale = 1000.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+    case MPU9250_GYRO_SCALE_2000DPS:
+        device->gyro_scale = 2000.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+    default:
+        return -1;
+    }
+
     return mpu9250_update_reg(device,
                               REG_GYRO_CONFIG,
                               scale << MPU9250_GYRO_CONFIG_SCALE_SHIFT,
@@ -133,6 +173,19 @@ int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
 
 int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scale)
 {
+    switch (scale) {
+    case MPU9250_ACCEL_SCALE_2G:
+        device->accel_scale = G_TO_MS * 2.0 / pow(2, ACCEL_RESOLUTION_BITS);
+    case MPU9250_ACCEL_SCALE_4G:
+        device->accel_scale = G_TO_MS * 4.0 / pow(2, ACCEL_RESOLUTION_BITS);
+    case MPU9250_ACCEL_SCALE_8G:
+        device->accel_scale = G_TO_MS * 8.0 / pow(2, ACCEL_RESOLUTION_BITS);
+    case MPU9250_ACCEL_SCALE_16G:
+        device->accel_scale = G_TO_MS * 16.0 / pow(2, ACCEL_RESOLUTION_BITS);
+    default:
+        return -1;
+    }
+
     return mpu9250_update_reg(device,
                               REG_ACCEL_CONFIG_1,
                               scale << MPU9250_ACCEL_CONFIG_1_SCALE_SHIFT,
@@ -155,6 +208,21 @@ int mpu9250_read_gyro_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, ui
 
 }
 
+int mpu9250_read_gyro(struct mpu9250_s *device, float *x, float *y, float *z)
+{
+    uint16_t raw_x, raw_y, raw_z;
+    int res;
+
+    res = mpu9250_read_gyro_raw(device, &raw_x, &raw_y, &raw_z);
+    if (res >= 0) {
+        *x = raw_x * device->gyro_scale;
+        *y = raw_y * device->gyro_scale;
+        *z = raw_z * device->gyro_scale;
+    }
+
+    return res;
+}
+
 int mpu9250_read_accel_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z)
 {
     uint8_t data_in[6];
@@ -170,6 +238,21 @@ int mpu9250_read_accel_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, u
 
 }
 
+int mpu9250_read_accel(struct mpu9250_s *device, float *x, float *y, float *z)
+{
+    uint16_t raw_x, raw_y, raw_z;
+    int res;
+
+    res = mpu9250_read_accel_raw(device, &raw_x, &raw_y, &raw_z);
+    if (res >= 0) {
+        *x = raw_x * device->accel_scale;
+        *y = raw_y * device->accel_scale;
+        *z = raw_z * device->accel_scale;
+    }
+
+    return res;
+}
+
 int mpu9250_read_temp_raw(struct mpu9250_s *device, uint16_t *temp)
 {
     uint8_t data_in[2];
@@ -179,6 +262,22 @@ int mpu9250_read_temp_raw(struct mpu9250_s *device, uint16_t *temp)
     if (res >= 0) {
         *temp = data_in[0] << 8 | data_in[1];
     }
+    return res;
+}
+
+int mpu9250_read_temp(struct mpu9250_s *device, float* temp)
+{
+
+    uint16_t raw_temp;
+    int res;
+
+    res = mpu9250_read_temp_raw(device, &raw_temp);
+    if (res >= 0) {
+        //TODO: no datasheet source for these factors
+        // Find and refactor out to constants.
+        *temp = ((float)raw_temp / 340) + 36.53;
+    }
+
     return res;
 }
 
