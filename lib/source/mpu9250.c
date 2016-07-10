@@ -129,10 +129,18 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
     }
 
     // Enable compass
-
+    
 
     // Set default scales
+    res = mpu9250_set_gyro_scale(device, MPU9250_GYRO_SCALE_2000DPS);
+    if (res < 0) {
+        return MPU9250_DRIVER_ERROR;
+    }
 
+    res = mpu9250_set_accel_scale(device, MPU9250_ACCEL_SCALE_16G);
+    if (res < 0) {
+        return MPU9250_DRIVER_ERROR;
+    }
 
     // Set default sampling rate & filter
 

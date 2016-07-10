@@ -19,6 +19,10 @@ extern "C" {
 #define MPU9250_GYRO_CONFIG_SCALE_MASK          0x18
 #define MPU9250_GYRO_CONFIG_SCALE_SHIFT         3
 
+/**
+ * Gyro full scale setting
+ * Configures the maximum operating range of the gyroscope
+ */
 typedef enum {
     MPU9250_GYRO_SCALE_250DPS  = 0x00,
     MPU9250_GYRO_SCALE_500DPS  = 0x01,
@@ -37,6 +41,10 @@ typedef enum {
 #define MPU9250_ACCEL_CONFIG_1_SCALE_MASK          0x18
 #define MPU9250_ACCEL_CONFIG_1_SCALE_SHIFT         3
 
+/**
+ * Accelerometer full scale setting
+ * Configures the maximum operating range of the accelerometer
+ */
 typedef enum {
     MPU9250_ACCEL_SCALE_2G  = 0x00,
     MPU9250_ACCEL_SCALE_4G  = 0x01,
@@ -46,11 +54,27 @@ typedef enum {
 
 #define ACCEL_RESOLUTION_BITS   16
 
+/**
+ * Accelerometer Digital Low Pass Filter (DPLF) bandwidth configuration
+ * DPLF can be disabled with ACCEL_FCHOICE = 0
+ */
+typedef enum {
+    MPU9250_ACCEL_DPLF_CFG_1_13KHz_DELAY_0_75MS = 0x00,     //!< BW: 1.13 kHz Delay: 0.75 ms rate: 4kHz. DPLF disabled.
+    MPU9250_ACCEL_DPLF_CFG_460Hz_DELAY_1_94MS   = 0x00,     //!< BW: 460Hz Delay: 1.94 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_184Hz_DELAY_5_80MS   = 0x01,     //!< BW: 184Hz Delay: 5.80 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_92Hz_DELAY_7_80MS    = 0x02,     //!< BW: 92Hz Delay: 7.10 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_41Hz_DELAY_11_80MS   = 0x03,     //!< BW: 41Hz Delay: 11.80 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_20Hz_DELAY_19_80MS   = 0x04,     //!< BW: 20Hz Delay: 19.80 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_10Hz_DELAY_35_70MS   = 0x05,     //!< BW: 10Hz Delay: 35.70 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_5Hz_DELAY_66_96MS    = 0x06,     //!< BW: 5Hz Delay: 66.96 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_460Hz_DELAY_1_94MS   = 0x07,     //!< BW: 460Hz Delay: 1.94 ms rate: 1kHz
+} mpu9250_accel_dplf_cfg_e;
+
 // General configuration
 #define MPU9250_REG_READ_FLAG       0x80
 #define MPU9250_REG_WRITE_FLAG      0x80
 
-#define MPU9250_PWR_MGMT_1_HRESET   (1 << 7)
+#define MPU9250_PWR_MGMT_1_HRESET   (1 << 7)    //!< Power management reset flag
 
 // MPU9250 object for internal use
 struct mpu9250_s {
