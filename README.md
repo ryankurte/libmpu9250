@@ -1,6 +1,6 @@
 # mpu9250-library
 
-A Dependency Injection based SPI Driver library for the MPU9250 from InvenSense.  
+A Dependency Injection based SPI Driver library for the MPU9250 9-DOF IMU from InvenSense.  
 This is a work in progress, see Status for more information.
 
 ## Usage
@@ -17,10 +17,11 @@ Both of the above functions should return >= 0 for success, < 0 for failure. For
 - [X] Register operations
 - [X] Initialisation
 - [X] Polling 
+- [ ] Compass passthrough
 - [ ] Filter Configuration
 - [ ] Autonomous mode (free wheeling)
 - [ ] Externally triggered mode
-
+- [ ] DMA support
 
 ------
 
