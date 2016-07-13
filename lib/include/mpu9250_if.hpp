@@ -16,14 +16,14 @@ namespace MPU9250
 // SPI driver interface class
 class SpiDriverInterface {
 public:
-    virtual int spi_transfer(uint8_t *data_in, uint8_t* data_out, uint8_t len) = 0;
+    virtual int spi_transfer(uint8_t len, uint8_t *data_out, uint8_t* data_in) = 0;
 };
 
 // Adaptor function, allows c++ object to be called from c(ish) context
-int8_t mpu9250_transfer_data_adaptor(void* context, uint8_t *data_in, uint8_t* data_out, uint8_t size)
+int8_t mpu9250_transfer_data_adaptor(void* context, uint8_t len, uint8_t *data_out, uint8_t* data_in)
 {
     SpiDriverInterface *driver = (SpiDriverInterface*) context;
-    return driver->spi_transfer(data_in, data_out, size);
+    return driver->spi_transfer(len, data_out, data_in);
 }
 
 // SPI Driver wrapper object

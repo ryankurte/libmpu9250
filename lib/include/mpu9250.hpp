@@ -41,14 +41,24 @@ public:
         return mpu9250_set_accel_scale(&(this->device), scale);
     }
 
-    int read_gyro_raw(uint16_t *x, uint16_t *y, uint16_t *z) {
+    int read_gyro_raw(int16_t *x, int16_t *y, int16_t *z) {
         return mpu9250_read_gyro_raw(&(this->device), x, y, z);
     }
-    int read_accel_raw(uint16_t *x, uint16_t *y, uint16_t *z) {
+    int read_accel_raw(int16_t *x, int16_t *y, int16_t *z) {
         return mpu9250_read_accel_raw(&(this->device), x, y, z);
     }
-    int read_temp_raw(uint16_t *temp) {
+    int read_temp_raw(int16_t *temp) {
         return mpu9250_read_temp_raw(&(this->device), temp);
+    }
+
+    int read_gyro(float *x, float *y, float *z) {
+        return mpu9250_read_gyro(&(this->device), x, y, z);
+    }
+    int read_accel(float *x, float *y, float *z) {
+        return mpu9250_read_accel(&(this->device), x, y, z);
+    }
+    int read_temp(float *temp) {
+        return mpu9250_read_temp(&(this->device), temp);
     }
 
 private:

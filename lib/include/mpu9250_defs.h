@@ -31,7 +31,7 @@ typedef enum {
 } mpu9250_gyro_scale_e;
 
 #define GYRO_RESOLUTION_BITS    16
-
+#define GYRO_SCALE_BASE         (pow(2, GYRO_RESOLUTION_BITS) / 2)
 
 // Accel configuration definitions
 #define MPU9250_ACCEL_CONFIG_1_X_SELF_TEST_EN     (1 << 7)
@@ -53,6 +53,7 @@ typedef enum {
 } mpu9250_accel_scale_e;
 
 #define ACCEL_RESOLUTION_BITS   16
+#define ACCEL_SCALE_BASE        (pow(2, ACCEL_RESOLUTION_BITS) / 2)
 
 /**
  * Accelerometer Digital Low Pass Filter (DPLF) bandwidth configuration
@@ -67,12 +68,12 @@ typedef enum {
     MPU9250_ACCEL_DPLF_CFG_20Hz_DELAY_19_80MS   = 0x04,     //!< BW: 20Hz Delay: 19.80 ms rate: 1kHz
     MPU9250_ACCEL_DPLF_CFG_10Hz_DELAY_35_70MS   = 0x05,     //!< BW: 10Hz Delay: 35.70 ms rate: 1kHz
     MPU9250_ACCEL_DPLF_CFG_5Hz_DELAY_66_96MS    = 0x06,     //!< BW: 5Hz Delay: 66.96 ms rate: 1kHz
-    MPU9250_ACCEL_DPLF_CFG_460Hz_DELAY_1_94MS   = 0x07,     //!< BW: 460Hz Delay: 1.94 ms rate: 1kHz
+    MPU9250_ACCEL_DPLF_CFG_460Hz_DELAY_1_94MS_B = 0x07,     //!< BW: 460Hz Delay: 1.94 ms rate: 1kHz
 } mpu9250_accel_dplf_cfg_e;
 
 // General configuration
 #define MPU9250_REG_READ_FLAG       0x80
-#define MPU9250_REG_WRITE_FLAG      0x80
+#define MPU9250_REG_WRITE_FLAG      0x00
 
 #define MPU9250_PWR_MGMT_1_HRESET   (1 << 7)    //!< Power management reset flag
 

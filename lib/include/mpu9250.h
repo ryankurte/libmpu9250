@@ -18,7 +18,7 @@ enum mpu9250_result_e {
 };
 
 // SPI interaction function for dependency injection
-typedef int8_t (*spi_transfer_f)(void* context, uint8_t *data_in, uint8_t* data_out, uint8_t len);
+typedef int8_t (*spi_transfer_f)(void* context, uint8_t len, uint8_t *data_out, uint8_t* data_in);
 
 // Driver object for passing in to MPU9250 object
 struct mpu9250_driver_s {
@@ -40,9 +40,9 @@ int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
 int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scale);
 
 /****       Raw readings            ****/
-int mpu9250_read_gyro_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
-int mpu9250_read_accel_raw(struct mpu9250_s *device, uint16_t *x, uint16_t *y, uint16_t *z);
-int mpu9250_read_temp_raw(struct mpu9250_s *device, uint16_t *temp);
+int mpu9250_read_gyro_raw(struct mpu9250_s *device, int16_t *x, int16_t *y, int16_t *z);
+int mpu9250_read_accel_raw(struct mpu9250_s *device, int16_t *x, int16_t *y, int16_t *z);
+int mpu9250_read_temp_raw(struct mpu9250_s *device, int16_t *temp);
 
 /****       Processed readings      ****/
 int mpu9250_read_gyro(struct mpu9250_s *device, float *x, float *y, float *z);
