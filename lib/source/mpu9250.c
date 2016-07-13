@@ -12,15 +12,36 @@
 
 #include "mpu9250_regs.h"
 
+// Scalar for conversion from G to ms-2
+#define G_TO_MS 9.80665
+
+// Define PI if not available
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-#define G_TO_MS 9.80665
+// Automagically define PLATFORM_SLEEP_MS on unix-like platforms
+#ifndef PLATFORM_SLEEP_MS
+#if (defined __linux__ || defined __APPLE__ || defined __unix__)
+#include <unistd.h>
+#define PLATFORM_SLEEP_MS(a)    usleep(a * 1000);
+#else
+#error "PLATFORM_SLEEP_MS undefined and platform not recognised"
+#endif
+
+#endif
+
+// Wrap debug outputs
+#ifdef DEBUG_MPU9250
+#define MPU9250_DEBUG_PRINT(...) printf(__VA_ARGS__)
+#else
+#define MPU9250_DEBUG_PRINT(...)
+#endif
 
 
 /***        Internal Functions          ***/
 
+// Read a single register from the device
 static int mpu9250_read_reg(struct mpu9250_s *device, uint8_t reg, uint8_t* val)
 {
     uint8_t data_out[2] = {0xFF, 0xFF};
@@ -39,6 +60,7 @@ static int mpu9250_read_reg(struct mpu9250_s *device, uint8_t reg, uint8_t* val)
     return res;
 }
 
+// Read an array of registers from the device
 static int mpu9250_read_regs(struct mpu9250_s *device, uint8_t start, uint8_t length, uint8_t* data)
 {
     uint8_t data_out[length + 1];
@@ -61,6 +83,7 @@ static int mpu9250_read_regs(struct mpu9250_s *device, uint8_t start, uint8_t le
     return res;
 }
 
+// Write a single register on the device
 static int mpu9250_write_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val)
 {
     uint8_t data_out[2] = {0xFF, 0xFF};
@@ -75,6 +98,8 @@ static int mpu9250_write_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val)
     return res;
 }
 
+// Update a single register on the device
+// Mask should be the mask for the information to be changed
 int mpu9250_update_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val, uint8_t mask)
 {
     uint8_t data = 0;
@@ -109,46 +134,46 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
     device->driver = driver;
     device->driver_ctx = driver_ctx;
 
-    // TODO: init
+    // Initialize device
 
     // Hard reset chip (nb. only works if SPI working)
     res = mpu9250_write_reg(device, REG_PWR_MGMT_1, MPU9250_PWR_MGMT_1_HRESET);
     if (res < 0) {
-        printf("RESET write error: %d\r\n", res);
+        MPU9250_DEBUG_PRINT("RESET write error: %d\r\n", res);
         return MPU9250_DRIVER_ERROR;
     }
 
-    //TODO: do we need a wait here? Probably.
-    usleep(10000);
+    // Give device time to reset
+    PLATFORM_SLEEP_MS(10);
 
-    printf("RESET complete\r\n");
+    MPU9250_DEBUG_PRINT("RESET complete\r\n");
 
     // Check communication
     uint8_t who;
     res = mpu9250_read_reg(device, REG_WHO_AM_I, &who);
     if (res < 0) {
-        printf("WHOAMI read error: %d\r\n", res);
+        MPU9250_DEBUG_PRINT("WHOAMI read error: %d\r\n", res);
         return MPU9250_DRIVER_ERROR;
     }
     if (who != 0x71) {
-        printf("Unexpected response: %.2x\r\n", who);
+        MPU9250_DEBUG_PRINT("Unexpected response: %.2x\r\n", who);
         return MPU9250_COMMS_ERROR;
     }
 
-    printf("Device identified\r\n");
+    MPU9250_DEBUG_PRINT("Device identified\r\n");
 
     // TODO: Enable compass
 
     // Set default scales
     res = mpu9250_set_gyro_scale(device, MPU9250_GYRO_SCALE_2000DPS);
     if (res < 0) {
-        printf("Error %d setting gyro scale\r\n", res);
+        MPU9250_DEBUG_PRINT("Error %d setting gyro scale\r\n", res);
         return MPU9250_DRIVER_ERROR;
     }
 
     res = mpu9250_set_accel_scale(device, MPU9250_ACCEL_SCALE_16G);
     if (res < 0) {
-        printf("Error %d setting accel scale\r\n", res);
+        MPU9250_DEBUG_PRINT("Error %d setting accel scale\r\n", res);
         return MPU9250_DRIVER_ERROR;
     }
 
