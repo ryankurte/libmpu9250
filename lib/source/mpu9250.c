@@ -172,16 +172,16 @@ int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
 {
     switch (scale) {
     case MPU9250_GYRO_SCALE_250DPS:
-        device->gyro_scale = 250.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+        device->gyro_scale = 250.0 / 180 * M_PI / (float)GYRO_SCALE_BASE;
         break;
     case MPU9250_GYRO_SCALE_500DPS:
-        device->gyro_scale = 500.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+        device->gyro_scale = 500.0 / 180 * M_PI / (float)GYRO_SCALE_BASE;
         break;
     case MPU9250_GYRO_SCALE_1000DPS:
-        device->gyro_scale = 1000.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+        device->gyro_scale = 1000.0 / 180 * M_PI / (float)GYRO_SCALE_BASE;
         break;
     case MPU9250_GYRO_SCALE_2000DPS:
-        device->gyro_scale = 2000.0 / 180 * M_PI / pow(2, GYRO_RESOLUTION_BITS);
+        device->gyro_scale = 2000.0 / 180 * M_PI / (float)GYRO_SCALE_BASE;
         break;
     default:
         return -1;
@@ -200,13 +200,13 @@ int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scal
         device->accel_scale = 2.0 / (float)ACCEL_SCALE_BASE;
         break;
     case MPU9250_ACCEL_SCALE_4G:
-        device->accel_scale = 2.0 / (float)ACCEL_SCALE_BASE;
+        device->accel_scale = 4.0 / (float)ACCEL_SCALE_BASE;
         break;
     case MPU9250_ACCEL_SCALE_8G:
-        device->accel_scale = 2.0 / (float)ACCEL_SCALE_BASE;
+        device->accel_scale = 8.0 / (float)ACCEL_SCALE_BASE;
         break;
     case MPU9250_ACCEL_SCALE_16G:
-        device->accel_scale = 2.0 / (float)ACCEL_SCALE_BASE;
+        device->accel_scale = 16.0 / (float)ACCEL_SCALE_BASE;
         break;
     default:
         return -1;
