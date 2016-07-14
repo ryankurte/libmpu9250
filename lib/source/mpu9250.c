@@ -153,7 +153,7 @@ int mpu9250_read_compass_reg(struct mpu9250_s *device, uint8_t reg, uint8_t *val
 {
     int res;
 
-    // Set I2C to write address
+    // Set I2C to read address
     res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR | MPU9250_COMPASS_READ_FLAG);
     if (res < 0) {
         return res;
@@ -181,7 +181,7 @@ int mpu9250_read_compass_regs(struct mpu9250_s *device, uint8_t reg, uint8_t len
 {
     int res;
 
-    // Set I2C to write address
+    // Set I2C to read address
     res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR | MPU9250_COMPASS_READ_FLAG);
     if (res < 0) {
         return res;
@@ -297,7 +297,7 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
         return MPU9250_DRIVER_ERROR;
     }
 
-    //TODO: set compass auto trigger from MPU
+    //TODO: set compass auto trigger from MPU to regs
 
 
     return 0;

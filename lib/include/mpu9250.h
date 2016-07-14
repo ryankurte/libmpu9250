@@ -23,7 +23,7 @@ enum mpu9250_result_e {
 };
 
 // SPI interaction function for dependency injection
-typedef int8_t (*spi_transfer_f)(void* context, uint8_t len, uint8_t *data_out, uint8_t* data_in);
+typedef int (*spi_transfer_f)(void* context, int len, uint8_t *data_out, uint8_t* data_in);
 
 // Driver object for passing in to MPU9250 object
 struct mpu9250_driver_s {

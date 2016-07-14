@@ -10,6 +10,6 @@
 class MockSpi : public MPU9250::SpiDriverInterface
 {
 public:
-    MOCK_METHOD3(spi_transfer, int(uint8_t len, uint8_t* data_out, uint8_t *data_in));
+    MOCK_METHOD3(spi_transfer, int(int len, uint8_t* data_out, uint8_t *data_in));
 
 };

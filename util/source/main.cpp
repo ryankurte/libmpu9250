@@ -19,7 +19,7 @@ void int_handler(int dummy)
 }
 
 // SPI transfer binding
-int8_t spi_transfer(void* context, uint8_t len, uint8_t *data_out, uint8_t* data_in)
+int spi_transfer(void* context, int len, uint8_t *data_out, uint8_t* data_in)
 {
     usbthing_t *usbthing = (usbthing_t *) context;
     int res;
