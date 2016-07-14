@@ -452,4 +452,20 @@ int mpu9250_read_temp(struct mpu9250_s *device, float* temp)
     return res;
 }
 
+int mpu9250_read_compass_raw(struct mpu9250_s *device, int16_t *temp, int16_t *x, int16_t *y, int16_t *z)
+{
+    uint8_t data_in[7];
+    int res;
+
+    // ST2 reg must be read to unlatch data registers
+    // As this immediately follows the data register, this is easily achieved by reading 7 bytes
+    res = mpu9250_read_compass_regs(device, MPU9250_COMPASS_REG_HXL, 7, data_in);
+    if (res >= 0) {
+        *x = (int16_t)data_in[0] << 8 | data_in[1];
+        *y = (int16_t)data_in[2] << 8 | data_in[3];
+        *z = (int16_t)data_in[4] << 8 | data_in[5];
+    }
+    return res;
+}
+
 
