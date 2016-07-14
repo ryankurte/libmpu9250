@@ -71,11 +71,83 @@ typedef enum {
     MPU9250_ACCEL_DPLF_CFG_460Hz_DELAY_1_94MS_B = 0x07,     //!< BW: 460Hz Delay: 1.94 ms rate: 1kHz
 } mpu9250_accel_dplf_cfg_e;
 
+// I2C Master Control Register
+#define MPU9250_I2C_MST_CTRL_MULTI_MST_EN  (1 << 7)    //!< Enable molti-master capability
+#define MPU9250_I2C_MST_CTRL_WAIT_FOR_ES   (1 << 6)    //!< Delay data ready interrupt for external sensor data
+#define MPU9250_I2C_MST_CTRL_SLV_3_FIFO_EN (1 << 4)    //!< Write EXT_SENS_DATA regusters for SLV3 to FIFO
+#define MPU9250_I2C_MST_CTRL_I2C_MST_P_NSR (1 << 2)    //!< I2C master transition mode. 0 to restart, 1 to reset
+
+#define MPU9250_I2C_MST_CTRL_CLK_MSK        0x07        //!< Mask for I2C clock in I2C_MST_CTRL register
+
+/**
+ * I2C Master clock frequencies
+ * Used in the I2C_MST_CTRL register
+ */
+typedef enum {
+    MPU9250_I2C_MST_CLK_348_KHZ = 0x00,
+    MPU9250_I2C_MST_CLK_333_KHZ = 0x01,
+    MPU9250_I2C_MST_CLK_320_KHZ = 0x02,
+    MPU9250_I2C_MST_CLK_308_KHZ = 0x03,
+    MPU9250_I2C_MST_CLK_296_KHZ = 0x04,
+    MPU9250_I2C_MST_CLK_286_KHZ = 0x05,
+    MPU9250_I2C_MST_CLK_276_KHZ = 0x06,
+    MPU9250_I2C_MST_CLK_267_KHZ = 0x07,
+    MPU9250_I2C_MST_CLK_258_KHZ = 0x08,
+    MPU9250_I2C_MST_CLK_500_KHZ = 0x09,
+    MPU9250_I2C_MST_CLK_471_KHZ = 0x0a,
+    MPU9250_I2C_MST_CLK_444_KHZ = 0x0b,
+    MPU9250_I2C_MST_CLK_421_KHZ = 0x0c,
+    MPU9250_I2C_MST_CLK_400_KHZ = 0x0d,
+    MPU9250_I2C_MST_CLK_381_KHZ = 0x0e,
+    MPU9250_I2C_MST_CLK_364_KHZ = 0x0f
+} mpu9250_i2c_mst_clk_e;
+
+// User Control Register
+#define MPU9250_USER_CTRL_FIFO_EN       (1 << 6)    //!< Enable FIFO operation mode
+#define MPU9250_USER_CTRL_I2C_MST_EN    (1 << 5)    //!< Enable I2C master mode
+#define MPU9250_USER_CTRL_I2C_IF_DIS    (1 << 4)    //!< Disable I2C master mode
+#define MPU9250_USER_CTRL_FIFO_RST      (1 << 2)    //!< Reset FIFO module
+#define MPU9250_USER_CTRL_I2C_MST_RST   (1 << 1)    //!< Reset I2C master module
+#define MPU9250_USER_CTRL_SIG_COND_RST  (1 << 0)    //!< Reset all signal paths
+
 // General configuration
 #define MPU9250_REG_READ_FLAG       0x80
 #define MPU9250_REG_WRITE_FLAG      0x00
 
 #define MPU9250_PWR_MGMT_1_HRESET   (1 << 7)    //!< Power management reset flag
+
+// I2C Slave control
+#define MPU9250_I2C_SLV_CTRL_EN         (1 << 7)    //!< Enable an I2C slave 
+#define MPU9250_I2C_SLV_CTRL_BYTE_SW    (1 << 6)    //!< Enable byte swapping on read
+#define MPU9250_I2C_SLV_CTRL_REG_DIS    (1 << 5)    //!< Disable register setting (read/write data only)
+#define MPU9250_I2C_SLV_CTRL_GRP        (1 << 4)    //!< Data grouping. 0 for 0 & 1, 1 for 1 & 2 
+
+#define MPU9250_I2C_SLV_CTRL_LENG_SHIFT  0       //!< Shift for slave transfer length setting
+#define MPU9250_I2C_SLV_CTRL_LENG_MASK   0x07    //!< Mask for slave transfer length setting
+
+// Compass configuration
+#define MPU9250_COMPASS_ADDR        0x0c    //!< Compass I2C address
+#define MPU9250_COMPASS_ID          0x48    //!< Compass device ID (for device recognition)
+
+#define MPU9250_COMPASS_READ_FLAG   0x80    //!< Read flag for the I2C compass
+#define MPU9250_COMPASS_WRITE_FLAG  0x00    //!< Write flag for the I2C compass
+
+#define MPU9250_COMPASS_CTL1_MODE_SHIFT  0       //!< Shift for compass mode setting
+#define MPU9250_COMPASS_CTL1_MODE_MASK   0x0F    //!< Mask for compass mode setting
+typedef enum {
+    MPU9250_COMPASS_MODE_OFF            = 0x00,
+    MPU9250_COMPASS_MODE_SINGLE         = 0x01,
+    MPU9250_COMPASS_MODE_CONTINUOUS1    = 0x02,
+    MPU9250_COMPASS_MODE_CONTINUOUS2    = 0x06,
+    MPU9250_COMPASS_MODE_EXT_TRIGGER    = 0x04,
+    MPU9250_COMPASS_MODE_SELF_TEST      = 0x08,
+    MPU9250_COMPASS_MODE_FUSE_ROM       = 0x0F,
+} mpu9250_compass_mode_e;
+
+#define MPU9250_COMPASS_CTL1_OUTPUT_14BIT    (0 << 4)
+#define MPU9250_COMPASS_CTL1_OUTPUT_16BIT    (1 << 4)
+
+#define MPU9250_COMPASS_CTL2_RESET           (1 << 0)
 
 // MPU9250 object for internal use
 struct mpu9250_s {

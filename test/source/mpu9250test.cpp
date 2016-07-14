@@ -56,8 +56,8 @@ TEST_F(Mpu9250Test, SetGyroRate)
   int res;
   Sequence s1;
 
-  uint8_t read_addr = REG_GYRO_CONFIG | MPU9250_REG_READ_FLAG;
-  uint8_t write_addr = REG_GYRO_CONFIG | MPU9250_REG_WRITE_FLAG;
+  uint8_t read_addr = MPU9250_REG_GYRO_CONFIG | MPU9250_REG_READ_FLAG;
+  uint8_t write_addr = MPU9250_REG_GYRO_CONFIG | MPU9250_REG_WRITE_FLAG;
   uint8_t mock_read[] = {0x00, 0x00};
   uint8_t read_cmd[] = {read_addr, 0x00};
   uint8_t write_cmd[] = {write_addr, MPU9250_GYRO_SCALE_500DPS << MPU9250_GYRO_CONFIG_SCALE_SHIFT};

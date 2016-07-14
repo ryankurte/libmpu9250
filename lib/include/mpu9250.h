@@ -1,3 +1,8 @@
+/*
+ * mpu9250 9-DOF IMU driver
+ *
+ * Copyright 2016 Ryan Kurte
+ */
 
 #ifndef MPU9250_H
 #define MPU9250_H

@@ -12,6 +12,8 @@
 
 #include "mpu9250_regs.h"
 
+//#define DEBUG_MPU9250
+
 // Scalar for conversion from G to ms-2
 #define G_TO_MS 9.80665
 
@@ -119,6 +121,90 @@ int mpu9250_update_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val, uint8
     return mpu9250_write_reg(device, reg, data);
 }
 
+// Write a single compass register
+int mpu9250_write_compass_reg(struct mpu9250_s *device, uint8_t reg, uint8_t val)
+{
+    int res;
+
+    // Set I2C to write address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR | MPU9250_COMPASS_WRITE_FLAG);
+    if (res < 0) {
+        return res;
+    }
+    // Set register address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_REG, reg);
+    if (res < 0) {
+        return res;
+    }
+    // Buffer data for writing
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_DO, val);
+    if (res < 0) {
+        return res;
+    }
+    // Trigger write
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_CTRL, MPU9250_I2C_SLV_CTRL_EN | (1 & MPU9250_I2C_SLV_CTRL_LENG_MASK));
+
+    return res;
+
+}
+
+// Read a single compass register
+int mpu9250_read_compass_reg(struct mpu9250_s *device, uint8_t reg, uint8_t *val)
+{
+    int res;
+
+    // Set I2C to write address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR | MPU9250_COMPASS_READ_FLAG);
+    if (res < 0) {
+        return res;
+    }
+    // Set register address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_REG, reg);
+    if (res < 0) {
+        return res;
+    }
+    // Trigger read
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_CTRL, MPU9250_I2C_SLV_CTRL_EN | (1 & MPU9250_I2C_SLV_CTRL_LENG_MASK));
+    if (res < 0) {
+        return res;
+    }
+
+    // Wait for response
+    PLATFORM_SLEEP_MS(1);
+
+    res = mpu9250_read_reg(device, MPU9250_REG_EXT_SENS_DATA_00, val);
+
+    return res;
+}
+
+int mpu9250_read_compass_regs(struct mpu9250_s *device, uint8_t reg, uint8_t len, uint8_t *vals)
+{
+    int res;
+
+    // Set I2C to write address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR | MPU9250_COMPASS_READ_FLAG);
+    if (res < 0) {
+        return res;
+    }
+    // Set register address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_REG, reg);
+    if (res < 0) {
+        return res;
+    }
+    // Trigger read
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_CTRL, MPU9250_I2C_SLV_CTRL_EN | (len & MPU9250_I2C_SLV_CTRL_LENG_MASK));
+    if (res < 0) {
+        return res;
+    }
+
+    // Wait for response
+    PLATFORM_SLEEP_MS(1);
+
+    res = mpu9250_read_regs(device, MPU9250_REG_EXT_SENS_DATA_00, len, vals);
+
+    return res;
+}
+
 /***        External Functions          ***/
 
 int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, void* driver_ctx)
@@ -137,7 +223,7 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
     // Initialize device
 
     // Hard reset chip (nb. only works if SPI working)
-    res = mpu9250_write_reg(device, REG_PWR_MGMT_1, MPU9250_PWR_MGMT_1_HRESET);
+    res = mpu9250_write_reg(device, MPU9250_REG_PWR_MGMT_1, MPU9250_PWR_MGMT_1_HRESET);
     if (res < 0) {
         MPU9250_DEBUG_PRINT("RESET write error: %d\r\n", res);
         return MPU9250_DRIVER_ERROR;
@@ -150,19 +236,17 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
 
     // Check communication
     uint8_t who;
-    res = mpu9250_read_reg(device, REG_WHO_AM_I, &who);
+    res = mpu9250_read_reg(device, MPU9250_REG_WHO_AM_I, &who);
     if (res < 0) {
         MPU9250_DEBUG_PRINT("WHOAMI read error: %d\r\n", res);
         return MPU9250_DRIVER_ERROR;
     }
     if (who != 0x71) {
-        MPU9250_DEBUG_PRINT("Unexpected response: %.2x\r\n", who);
+        MPU9250_DEBUG_PRINT("Unexpected whoami response: %.2x\r\n", who);
         return MPU9250_COMMS_ERROR;
     }
 
     MPU9250_DEBUG_PRINT("Device identified\r\n");
-
-    // TODO: Enable compass
 
     // Set default scales
     res = mpu9250_set_gyro_scale(device, MPU9250_GYRO_SCALE_2000DPS);
@@ -177,7 +261,43 @@ int8_t mpu9250_init(struct mpu9250_s *device, struct mpu9250_driver_s *driver, v
         return MPU9250_DRIVER_ERROR;
     }
 
-    // Set default sampling rate & filter
+    // TODO: Set default sampling rates & filters
+
+
+    // Enable compass
+
+    // Enable master mode
+    res = mpu9250_write_reg(device, MPU9250_REG_USER_CTRL, MPU9250_USER_CTRL_I2C_MST_EN);
+    // Set freq to 400kHz
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_MST_CTRL, MPU9250_I2C_MST_CLK_400_KHZ);
+    // Set compass device address
+    res = mpu9250_write_reg(device, MPU9250_REG_I2C_SLV0_ADDR, MPU9250_COMPASS_ADDR);
+
+    // Reset compass
+    res = mpu9250_write_compass_reg(device, MPU9250_COMPASS_REG_CNTL2, MPU9250_COMPASS_CTL2_RESET);
+
+    // Check for compass whoami response
+    res = mpu9250_read_compass_reg(device, MPU9250_COMPASS_REG_WIA, &who);
+    if (res < 0) {
+        MPU9250_DEBUG_PRINT("WHOAMI compass read error: %d\r\n", res);
+        return MPU9250_DRIVER_ERROR;
+    }
+    if (who != 0x48) {
+        MPU9250_DEBUG_PRINT("Unexpected compass whoami response: %.2x\r\n", who);
+        return MPU9250_COMMS_ERROR;
+    }
+
+    MPU9250_DEBUG_PRINT("Compass identified\r\n");
+
+    // Enable continuous measurement mode at 16-bit
+    res = mpu9250_write_compass_reg(device, MPU9250_COMPASS_REG_CNTL1, MPU9250_COMPASS_CTL1_OUTPUT_16BIT
+                                    | (MPU9250_COMPASS_CTL1_MODE_MASK & MPU9250_COMPASS_MODE_CONTINUOUS1));
+    if (res < 0) {
+        MPU9250_DEBUG_PRINT("Error %d setting compass mode\r\n", res);
+        return MPU9250_DRIVER_ERROR;
+    }
+
+    //TODO: set compass auto trigger from MPU
 
 
     return 0;
@@ -213,7 +333,7 @@ int mpu9250_set_gyro_scale(struct mpu9250_s *device, mpu9250_gyro_scale_e scale)
     }
 
     return mpu9250_update_reg(device,
-                              REG_GYRO_CONFIG,
+                              MPU9250_REG_GYRO_CONFIG,
                               scale << MPU9250_GYRO_CONFIG_SCALE_SHIFT,
                               MPU9250_GYRO_CONFIG_SCALE_MASK);
 }
@@ -238,7 +358,7 @@ int mpu9250_set_accel_scale(struct mpu9250_s *device, mpu9250_accel_scale_e scal
     }
 
     return mpu9250_update_reg(device,
-                              REG_ACCEL_CONFIG_1,
+                              MPU9250_REG_ACCEL_CONFIG_1,
                               scale << MPU9250_ACCEL_CONFIG_1_SCALE_SHIFT,
                               MPU9250_ACCEL_CONFIG_1_SCALE_MASK);
 }
@@ -249,7 +369,7 @@ int mpu9250_read_gyro_raw(struct mpu9250_s *device, int16_t *x, int16_t *y, int1
     uint8_t data_in[6];
     int res;
 
-    res = mpu9250_read_regs(device, REG_GYRO_XOUT_H, 6, data_in);
+    res = mpu9250_read_regs(device, MPU9250_REG_GYRO_XOUT_H, 6, data_in);
     if (res >= 0) {
         *x = (int16_t)data_in[0] << 8 | data_in[1];
         *y = (int16_t)data_in[2] << 8 | data_in[3];
@@ -279,7 +399,7 @@ int mpu9250_read_accel_raw(struct mpu9250_s *device, int16_t *x, int16_t *y, int
     uint8_t data_in[6];
     int res;
 
-    res = mpu9250_read_regs(device, REG_ACCEL_XOUT_H, 6, data_in);
+    res = mpu9250_read_regs(device, MPU9250_REG_ACCEL_XOUT_H, 6, data_in);
     if (res >= 0) {
         *x = (int16_t)data_in[0] << 8 | data_in[1];
         *y = (int16_t)data_in[2] << 8 | data_in[3];
@@ -309,7 +429,7 @@ int mpu9250_read_temp_raw(struct mpu9250_s *device, int16_t *temp)
     uint8_t data_in[2];
     int res;
 
-    res = mpu9250_read_regs(device, REG_TEMP_OUT_H, 2, data_in);
+    res = mpu9250_read_regs(device, MPU9250_REG_TEMP_OUT_H, 2, data_in);
     if (res >= 0) {
         *temp = data_in[0] << 8 | data_in[1];
     }
