@@ -17,7 +17,8 @@ Both of the above functions should return >= 0 for success, < 0 for failure. For
 - [X] Register operations
 - [X] Initialisation
 - [X] Polling 
-- [ ] Compass passthrough
+- [X] Compass Configuration
+- [ ] Compass Passthrough
 - [ ] Filter Configuration
 - [ ] Autonomous mode (free wheeling)
 - [ ] Externally triggered mode
