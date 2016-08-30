@@ -6,6 +6,7 @@
 # containing useful version information
 # To create an appropriate tag, use `git tag -a "vX.X.X" -m "message here"
 # For more information, see: 
+# https://gist.github.com/ryankurte/0cc1b536a72f29741460
 # http://electronpowered.org/2015/01/20/using-git-tags-to-track-software-versions/
  
 import argparse;
@@ -65,3 +66,5 @@ if(fileString != newString):
     f.write(newString);
     f.truncate();
     f.close();
+    
+    
