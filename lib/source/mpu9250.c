@@ -4,13 +4,13 @@
  * Copyright 2016 Ryan Kurte
  */
 
-#include "mpu9250.h"
+#include "mpu9250/mpu9250.h"
 
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 
-#include "mpu9250_regs.h"
+#include "mpu9250/mpu9250_regs.h"
 
 //#define DEBUG_MPU9250
 
@@ -28,7 +28,8 @@
 #include <unistd.h>
 #define PLATFORM_SLEEP_MS(a)    usleep(a * 1000);
 #else
-#error "PLATFORM_SLEEP_MS undefined and platform not recognised"
+#warning "PLATFORM_SLEEP_MS undefined and platform not recognised"
+#define PLATFORM_SLEEP_MS(a) for (volatile uint32_t i = 0; i < 1000000; i++);
 #endif
 
 #endif
@@ -170,6 +171,7 @@ int mpu9250_read_compass_reg(struct mpu9250_s *device, uint8_t reg, uint8_t *val
     }
 
     // Wait for response
+    //TODO: should be able to await interrupt on pin here
     PLATFORM_SLEEP_MS(1);
 
     res = mpu9250_read_reg(device, MPU9250_REG_EXT_SENS_DATA_00, val);

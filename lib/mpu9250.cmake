@@ -1,7 +1,7 @@
 # Libmpu9250 cmake include file
 
 # Add library includes
-include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
+include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 # Add project sources
 set(LIBMPU9250_SOURCES
