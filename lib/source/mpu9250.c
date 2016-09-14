@@ -22,16 +22,21 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// Automagically define PLATFORM_SLEEP_MS on unix-like platforms
+// Automagically define PLATFORM_SLEEP_MS and _US on unix-like platforms
 #ifndef PLATFORM_SLEEP_MS
 #if (defined __linux__ || defined __APPLE__ || defined __unix__)
 #include <unistd.h>
 #define PLATFORM_SLEEP_MS(a)    usleep(a * 1000);
+#define PLATFORM_SLEEP_US(a)    usleep(a);
 #else
 #warning "PLATFORM_SLEEP_MS undefined and platform not recognised"
 #define PLATFORM_SLEEP_MS(a) for (volatile uint32_t i = 0; i < 1000000; i++);
+#define PLATFORM_SLEEP_US(a) for (volatile uint32_t i = 0; i < 1000; i++);
 #endif
 
+#else
+extern void PLATFORM_SLEEP_MS(uint32_t);
+extern void PLATFORM_SLEEP_US(uint32_t);
 #endif
 
 // Wrap debug outputs
